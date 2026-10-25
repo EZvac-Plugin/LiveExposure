@@ -5,7 +5,7 @@
 
     <groupId>com.github.blade</groupId>
     <artifactId>liveexposure</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
     <packaging>jar</packaging>
 
     <name>LiveExposure</name>
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>com.github.EZvac-Plugin.EZvac</groupId>
             <artifactId>ezvac-api</artifactId>
-            <version>ALPHA-2.1-P4</version>
+            <version>ALPHA-2.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

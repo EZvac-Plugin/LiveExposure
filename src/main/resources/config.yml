@@ -18,10 +18,10 @@ comfort:
 
 rates:
   # Body cooling per minute, for every degree it feels below comfort.low-f:
-  # at 20 F that's 30 x 0.034 = about 1 F a minute.
-  cold-f-per-minute: 0.034
+  # at 20 F that's 30 x 0.068 = about 2 F a minute.
+  cold-f-per-minute: 0.068
   # Body warming per minute, for every degree it feels above comfort.high-f.
-  heat-f-per-minute: 0.027
+  heat-f-per-minute: 0.054
   # How fast the body returns to 98.6 F once comfortable.
   recovery-f-per-minute: 0.7
   # Water moves body heat this many times faster than air.
@@ -70,6 +70,33 @@ cold-resistance:
 shade:
   enabled: true
   cooling-f: 10.0
+
+# The body temperature on EZvac's climate HUD (/hvac hud), under the season
+# line where EZvac's sidebar has its {addons} line. Needs EZvac ALPHA 2.1 or
+# newer. On a server whose HUD is the action bar or the boss bar, put
+# {section:liveexposure:body} into EZvac's hud format to show it there.
+hud:
+  enabled: true
+  # MiniMessage. {body} the body temperature, {meter} a bar like EZvac's
+  # feels-like bar, {stage} the stage in its colour, {fever} the fever text
+  # while ill. At most 4 lines.
+  lines:
+    - "<gray>Body: <white>{body}{fever}"
+    - "{meter} {stage}"
+  # On one line, for action-bar and boss-bar HUDs.
+  inline: "<gray>Body <white>{body}</white> {stage}"
+  fever: " <gray>(fever)"
+  # The meter is empty at cold-f and full at hot-f, so 98.6 F sits mid-way.
+  meter:
+    cold-f: 91.0
+    hot-f: 106.0
+  # Normal, chilled, colder than that, overheating, and hotter than that.
+  colors:
+    normal: "#6ee07a"
+    chilled: "#8fd3ff"
+    cold: "#5ab0ff"
+    warm: "#ffb347"
+    hot: "#ff5c5c"
 
 # Sweat: drops falling from around an overheating player's head, more the
 # hotter they get. Purely visual.

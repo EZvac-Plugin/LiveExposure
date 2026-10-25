@@ -34,6 +34,7 @@ class ExposureSettingsTest {
         assertEquals(defaults.damage(), bundled.damage());
         assertEquals(defaults.coldResistance(), bundled.coldResistance());
         assertEquals(defaults.scope(), bundled.scope());
+        assertEquals(defaults.hud(), bundled.hud());
         assertTrue(bundled.sickness().enabled());
         assertArrayEquals(defaults.sickness().chances(), bundled.sickness().chances());
         assertArrayEquals(defaults.sickness().feverF(), bundled.sickness().feverF());

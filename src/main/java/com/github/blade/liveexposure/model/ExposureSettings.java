@@ -1,5 +1,6 @@
 package com.github.blade.liveexposure.model;
 
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 
@@ -16,7 +17,8 @@ import java.util.stream.Collectors;
  * Temperatures are Fahrenheit, as EZvac's API gives them.
  */
 public record ExposureSettings(Comfort comfort, Rates rates, Balance balance, Thresholds thresholds, Damage damage,
-                               ColdResistance coldResistance, Shade shade, Scope scope, Sickness sickness) {
+                               ColdResistance coldResistance, Shade shade, Scope scope, Sickness sickness,
+                               Hud hud) {
 
     /**
      * @param lowF  below this the body cools
@@ -197,6 +199,39 @@ public record ExposureSettings(Comfort comfort, Rates rates, Balance balance, Th
         }
     }
 
+    /**
+     * The body temperature on EZvac's climate HUD (EZvac API 1.1 and newer).
+     *
+     * @param lines      sidebar lines, MiniMessage, with {body} {meter} {stage} {fever}
+     * @param inline     the same on one line, for action-bar and boss-bar HUDs
+     * @param feverText  what {fever} shows while ill
+     * @param meterColdF the body temperature where the meter is empty
+     * @param meterHotF  where it is full
+     */
+    public record Hud(boolean enabled, List<String> lines, String inline, String feverText,
+                      double meterColdF, double meterHotF, String normalColor, String chilledColor,
+                      String coldColor, String warmColor, String hotColor) {
+        public static final List<String> LINES = List.of("<gray>Body: <white>{body}{fever}", "{meter} {stage}");
+        public static final String INLINE = "<gray>Body <white>{body}</white> {stage}";
+
+        public Hud {
+            lines = List.copyOf(lines);
+            if (lines.size() > 4) throw new IllegalArgumentException("hud.lines has room for at most 4 lines");
+            if (inline == null || feverText == null) throw new IllegalArgumentException("hud.inline and hud.fever must be text");
+            finite("hud.meter.cold-f", meterColdF);
+            finite("hud.meter.hot-f", meterHotF);
+            if (meterColdF >= meterHotF) throw new IllegalArgumentException("hud.meter.cold-f must be below hud.meter.hot-f");
+            for (String color : List.of(normalColor, chilledColor, coldColor, warmColor, hotColor))
+                if (color == null || TextColor.fromHexString(color) == null)
+                    throw new IllegalArgumentException("hud.colors must be #RRGGBB, got '" + color + "'");
+        }
+    }
+
+    private static Hud defaultHud(boolean enabled) {
+        return new Hud(enabled, Hud.LINES, Hud.INLINE, " <gray>(fever)", 91.0, 106.0,
+                "#6ee07a", "#8fd3ff", "#5ab0ff", "#ffb347", "#ff5c5c");
+    }
+
     public static ExposureSettings defaults() {
         return load(new MemoryConfiguration(), warning -> { });
     }
@@ -205,10 +240,10 @@ public record ExposureSettings(Comfort comfort, Rates rates, Balance balance, Th
     public static ExposureSettings load(ConfigurationSection config, Consumer<String> warn) {
         Comfort comfort = section("comfort", warn, () -> new Comfort(config.getDouble("comfort.low-f", 50.0),
                 config.getDouble("comfort.high-f", 86.0)), () -> new Comfort(50.0, 86.0));
-        Rates rates = section("rates", warn, () -> new Rates(config.getDouble("rates.cold-f-per-minute", 0.034),
-                config.getDouble("rates.heat-f-per-minute", 0.027),
+        Rates rates = section("rates", warn, () -> new Rates(config.getDouble("rates.cold-f-per-minute", 0.068),
+                config.getDouble("rates.heat-f-per-minute", 0.054),
                 config.getDouble("rates.recovery-f-per-minute", 0.7),
-                config.getDouble("rates.water-factor", 3.0)), () -> new Rates(0.034, 0.027, 0.7, 3.0));
+                config.getDouble("rates.water-factor", 3.0)), () -> new Rates(0.068, 0.054, 0.7, 3.0));
         Balance balance = section("balance", warn, () -> new Balance(config.getDouble("balance.heat-f-per-f", 0.25),
                 config.getDouble("balance.cold-f-per-f", 0.25)), () -> new Balance(0.25, 0.25));
         Thresholds thresholds = section("stages", warn, () -> new Thresholds(
@@ -251,7 +286,15 @@ public record ExposureSettings(Comfort comfort, Rates rates, Balance balance, Th
                 config.getDouble("sickness.water.days-per-bottle", 0.25),
                 config.getDouble("sickness.water.maximum-days", 1.0)),
                 () -> defaultSickness(config.getBoolean("sickness.enabled", true)));
-        return new ExposureSettings(comfort, rates, balance, thresholds, damage, cold, shade, scope, sickness);
+        Hud hud = section("hud", warn, () -> new Hud(config.getBoolean("hud.enabled", true),
+                config.isList("hud.lines") ? config.getStringList("hud.lines") : Hud.LINES,
+                config.getString("hud.inline", Hud.INLINE), config.getString("hud.fever", " <gray>(fever)"),
+                config.getDouble("hud.meter.cold-f", 91.0), config.getDouble("hud.meter.hot-f", 106.0),
+                config.getString("hud.colors.normal", "#6ee07a"), config.getString("hud.colors.chilled", "#8fd3ff"),
+                config.getString("hud.colors.cold", "#5ab0ff"), config.getString("hud.colors.warm", "#ffb347"),
+                config.getString("hud.colors.hot", "#ff5c5c")),
+                () -> defaultHud(config.getBoolean("hud.enabled", true)));
+        return new ExposureSettings(comfort, rates, balance, thresholds, damage, cold, shade, scope, sickness, hud);
     }
 
     private static Sickness defaultSickness(boolean enabled) {

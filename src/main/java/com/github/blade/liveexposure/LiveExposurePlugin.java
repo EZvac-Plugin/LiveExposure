@@ -2,13 +2,23 @@ package com.github.blade.liveexposure;
 
 import com.github.blade.hvac.api.EzvacApi;
 import com.github.blade.hvac.api.TemperatureUnit;
+import com.github.blade.liveexposure.model.ConfigUpgrade;
 import com.github.blade.liveexposure.model.ExposureSettings;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -44,6 +54,7 @@ public final class LiveExposurePlugin extends JavaPlugin {
             return;
         }
         saveDefaultConfig();
+        upgradeConfig();
         loadSettings();
         keys = PlayerState.Keys.of(this);
         for (Player player : getServer().getOnlinePlayers()) state(player);
@@ -56,10 +67,16 @@ public final class LiveExposurePlugin extends JavaPlugin {
             command.setExecutor(commands);
             command.setTabCompleter(commands);
         }
+        String section = BodyHud.register(this);
+        if (section == null)
+            getLogger().info("EZvac " + ezvac.pluginVersion() + " has API " + ezvac.apiVersion()
+                    + ", without HUD sections, so the body temperature isn't shown on the climate HUD."
+                    + " EZvac ALPHA 2.1 or newer shows it there.");
         // Saved now and then as well as on leaving, so a crash costs at most a minute.
         saveTask = getServer().getScheduler().runTaskTimer(this, this::saveAll, 1200L, 1200L);
         getLogger().info("LiveExposure enabled on EZvac " + ezvac.pluginVersion() + " (API " + ezvac.apiVersion()
                 + "); sickness " + (settings.sickness().enabled() ? "on" : "off") + ", "
+                + (section == null ? "" : "on the HUD as {section:" + section + "}, ")
                 + (settings.damage().lethal() ? "deadly" : "never deadly") + ".");
     }
 
@@ -69,6 +86,35 @@ public final class LiveExposurePlugin extends JavaPlugin {
         if (sickness != null) sickness.stop();
         if (keys != null) saveAll();
         states.clear();
+    }
+
+    /**
+     * Adds settings new since the server's config.yml was written, with their
+     * comments, keeping the old file as config.yml.before-<version>.bak.
+     * Nothing the server set is changed, except stock values whose stock changed.
+     */
+    private void upgradeConfig() {
+        File file = new File(getDataFolder(), "config.yml");
+        YamlConfiguration current = new YamlConfiguration();
+        YamlConfiguration bundled = new YamlConfiguration();
+        try (InputStream input = Objects.requireNonNull(getResource("config.yml"), "bundled config.yml")) {
+            current.load(file);
+            bundled.load(new InputStreamReader(input, StandardCharsets.UTF_8));
+        } catch (IOException | InvalidConfigurationException unreadable) {
+            // Never rewrite a file that couldn't be read: loadSettings says what's wrong with it.
+            return;
+        }
+        List<String> changed = ConfigUpgrade.apply(current, bundled);
+        if (changed.isEmpty()) return;
+        File backup = new File(getDataFolder(), "config.yml.before-" + getPluginMeta().getVersion() + ".bak");
+        try {
+            if (!backup.exists()) Files.copy(file.toPath(), backup.toPath());
+            current.save(file);
+            getLogger().info("Updated config.yml: " + String.join(", ", changed) + ". The previous file was kept as "
+                    + backup.getName() + ".");
+        } catch (IOException failure) {
+            getLogger().warning("Could not update config.yml (" + failure.getMessage() + "); it was left as it was.");
+        }
     }
 
     /** Reads config.yml again; a bad value warns and keeps its section's defaults. */

@@ -15,7 +15,8 @@ or hot it feels comes straight from EZvac, so all of these count:
 Stay out too long and it starts to hurt.
 
 > **Requires** EZvac ALPHA 2.1 Pilot 4 or newer (EZvac API 1.x), on Paper or
-> Purpur 1.21.1 with Java 21.
+> Purpur 1.21.1 with Java 21. The body temperature on EZvac's HUD needs
+> ALPHA 2.1 or newer.
 
 ## Stages
 
@@ -34,9 +35,10 @@ The body settles where the climate puts it: a warm 92 °F day only makes you run
 a little warm, and only real extremes can bring on heatstroke or freezing
 (`balance:` in config.yml). Leather, shade and a fever move these too.
 
-- **Pace:** at 20 °F outside, the body loses about 1 °F a minute. A few minutes out in the snow is fine; an evening isn't.
+- **Pace:** at 20 °F outside, the body loses about 2 °F a minute. A minute or two out in the snow is fine; staying out there isn't.
 - **Lethal by default:** heat and cold can kill. `lethal: false` keeps players at half a heart instead.
 - **Feedback:** the game's own frost overlay shows the cold, and overheating players visibly sweat. The action bar shows your body temperature whenever it's off.
+- **On EZvac's HUD** (`/hvac hud`): your body temperature, with a meter under it like EZvac's feels-like bar, coloured by stage. It goes on EZvac's `{addons}` line, under the season; `{section:liveexposure:body}` puts it anywhere else, including the action bar and boss bar formats. Change it under `hud:` in config.yml.
 
 ## Staying safe
 
@@ -85,9 +87,13 @@ Everything is in `plugins/LiveExposure/config.yml`, explained line by line:
 - rates, comfort band and stages;
 - damage, and the armour points;
 - worlds and game modes;
-- every number of the sickness system.
+- every number of the sickness system;
+- the body temperature on EZvac's HUD.
 
-A bad value warns in the console and that section uses its defaults.
+A bad value warns in the console and that section uses its defaults. After an
+update, config.yml gains the new settings with their comments; the settings
+you changed stay as they are, and the old file is kept as
+`config.yml.before-<version>.bak`.
 
 ## Building
 
