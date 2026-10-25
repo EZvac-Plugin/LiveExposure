@@ -41,6 +41,13 @@ else works as before.
   ones by itself; rates you changed are kept.
 - **The EZvac API** it builds against is now ALPHA 2.1 (API 1.1).
 
+### Fixed
+
+- **A fever never ended where the clock stands still.** Illnesses only moved
+  on when the world's day changed, so with `doDaylightCycle` off, or EZvac's
+  calendar paused, a fever (and the heat it brings) lasted forever. A full
+  day of game time (20 minutes) now counts as a day there too.
+
 ## 0.1.0
 
 The first release: body temperature and sickness, built on EZvac's API 1.0.
