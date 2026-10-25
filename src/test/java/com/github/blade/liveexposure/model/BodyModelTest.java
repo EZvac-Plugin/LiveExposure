@@ -31,16 +31,16 @@ class BodyModelTest {
 
     @Test
     void coldCostsDegreesPerMinuteByHowFarBelowComfort() {
-        // 20 F: 30 below comfort x 0.034 = about 1 F a minute.
-        assertEquals(0.034, cold, "the shipped rate");
+        // 20 F: 30 below comfort x 0.068 = about 2 F a minute.
+        assertEquals(0.068, cold, "the shipped rate");
         assertEquals(REST - 30 * cold, minutes(REST, air(20), 1), 1e-6);
         assertEquals(REST - 10 * cold, minutes(REST, air(40), 1), 1e-6);
     }
 
     @Test
     void heatAddsDegreesPerMinuteByHowFarAboveComfort() {
-        // 111 F: 25 above comfort x 0.027 = 0.675 F a minute.
-        assertEquals(0.027, heat, "the shipped rate");
+        // 111 F: 25 above comfort x 0.054 = 1.35 F a minute.
+        assertEquals(0.054, heat, "the shipped rate");
         assertEquals(REST + 25 * heat, minutes(REST, air(111), 1), 1e-6);
     }
 

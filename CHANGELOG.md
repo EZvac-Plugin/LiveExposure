@@ -2,6 +2,45 @@
 
 All notable changes to LiveExposure are recorded here.
 
+## 0.2.0
+
+Your body temperature on EZvac's climate HUD, and faster heat and cold.
+Needs EZvac ALPHA 2.1 or newer for the HUD; on ALPHA 2.1 Pilot 4 everything
+else works as before.
+
+### Added
+
+- **Body temperature on the HUD.** Under EZvac's season line, the sidebar
+  shows `Body: 98.6°F` and a meter under it, drawn with EZvac's own bar like
+  the feels-like one:
+  - the meter is empty at 91 °F and full at 106 °F, so normal sits in the
+    middle;
+  - it's coloured by stage, in EZvac's comfort colours, with the stage beside
+    it;
+  - `(fever)` shows while ill;
+  - it's hidden for players heat and cold don't affect (creative, spectator,
+    bypass, other worlds).
+- **Where it goes:** EZvac's `{addons}` line, or `{section:liveexposure:body}`
+  wherever you put it. Action-bar and boss-bar HUDs show it on one line where
+  their format has that token.
+- **Settings:** the new `hud:` section (`enabled`, `lines`, `inline`, `fever`,
+  `meter.cold-f` and `hot-f`, and the colours).
+- **config.yml stays up to date:** on startup it gains every setting added
+  since it was written, with its comments. Nothing you set is changed, and the
+  previous file is kept as `config.yml.before-<version>.bak`.
+
+### Changed
+
+- **Heat and cold work twice as fast:**
+  - `rates.cold-f-per-minute` is now 0.068 (was 0.034), so at 20 °F outside
+    the body loses about 2 °F a minute;
+  - `rates.heat-f-per-minute` is now 0.054 (was 0.027);
+  - where the body settles is unchanged, and so is the recovery rate.
+
+  A config.yml from 0.1.0 that still has the stock rates moves to the new
+  ones by itself; rates you changed are kept.
+- **The EZvac API** it builds against is now ALPHA 2.1 (API 1.1).
+
 ## 0.1.0
 
 The first release: body temperature and sickness, built on EZvac's API 1.0.
