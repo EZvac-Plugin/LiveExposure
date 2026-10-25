@@ -1,6 +1,7 @@
 package com.github.blade.liveexposure;
 
 import com.github.blade.hvac.api.SeasonView;
+import com.github.blade.liveexposure.model.DayClock;
 import com.github.blade.liveexposure.model.ExposureSettings;
 import com.github.blade.liveexposure.model.SicknessModel;
 import net.kyori.adventure.text.Component;
@@ -19,8 +20,9 @@ import java.util.UUID;
 
 /**
  * The optional sickness system: watches each world's day (EZvac's calendar,
- * or the world's own day count without seasons), rolls every player once a
- * day, counts time near sick players, and lets water help. Does nothing while
+ * or the world's own day count without seasons, and a day of game time where
+ * the clock stands still), rolls every player once a day, counts time near
+ * sick players, and lets water help. Does nothing while
  * {@code sickness.enabled} is false. Main thread only.
  */
 final class SicknessService {
@@ -33,6 +35,7 @@ final class SicknessService {
 
     private final LiveExposurePlugin plugin;
     private final Map<UUID, Day> days = new HashMap<>();
+    private final Map<UUID, DayClock> clocks = new HashMap<>();
     private BukkitTask task;
 
     SicknessService(LiveExposurePlugin plugin) {
@@ -52,7 +55,9 @@ final class SicknessService {
         for (World world : plugin.getServer().getWorlds()) {
             Day today = today(world);
             Day before = days.put(world.getUID(), today);
-            if (before != null && before.key() != today.key()) newDay(world, before.season());
+            DayClock clock = clocks.computeIfAbsent(world.getUID(), ignored -> new DayClock());
+            if (clock.turned(today.key(), world.getGameTime()))
+                newDay(world, before != null ? before.season() : today.season());
         }
         spread();
     }
