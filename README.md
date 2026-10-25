@@ -1,4 +1,5 @@
 # LiveExposure
+<img width="2560" height="2560" alt="Untitled - October 25, 2026 at 01 44 20-1" src="https://github.com/user-attachments/assets/2566e591-ad9b-4523-ae66-62b8cb5efb5d" />
 
 **Heat and cold that wear down survival players caught in the elements.** An
 addon for [EZvac](https://github.com/EZvac-Plugin/EZvac), the realistic HVAC
