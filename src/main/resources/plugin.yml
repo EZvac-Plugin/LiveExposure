@@ -1,0 +1,28 @@
+name: LiveExposure
+version: '${project.version}'
+main: com.github.blade.liveexposure.LiveExposurePlugin
+api-version: '1.21'
+author: bladestech
+description: Heat and cold that wear down survival players caught in the elements. An addon for EZvac.
+depend: [EZvac]
+commands:
+  bodytemp:
+    description: Shows your body temperature, and any sickness.
+    usage: /bodytemp
+    permission: liveexposure.use
+    aliases: [bodytemperature]
+  liveexposure:
+    description: LiveExposure admin commands.
+    usage: /liveexposure <reload|set|sick|cure|roll>
+    permission: liveexposure.admin
+    aliases: [lexp]
+permissions:
+  liveexposure.use:
+    description: Allows /bodytemp.
+    default: true
+  liveexposure.admin:
+    description: Allows /liveexposure reload, set, sick, cure and roll.
+    default: op
+  liveexposure.bypass:
+    description: Untouched by heat, cold and sickness.
+    default: false
