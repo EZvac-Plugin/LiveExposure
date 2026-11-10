@@ -5,6 +5,15 @@
 addon for [EZvac](https://github.com/EZvac-Plugin/EZvac), the realistic HVAC
 and indoor-climate plugin for Paper and Purpur.
 
+> **On Minecraft 26.1 and newer, LiveExposure is part of
+> [EZclimates](https://github.com/EZvac-Plugin/EZclimates).** Install
+> EZclimates and remove LiveExposure's jar (leave its folder): your settings
+> and your players' body temperatures are brought over. LiveExposure 0.2.0
+> stays here for Minecraft 1.21.x servers. On EZvac BETA 1.0 Pilot 4 and
+> newer its feels-like already counts the sun, so with 0.2.0 the heat in
+> full sun is harsher than before: set `shade.enabled: false` in
+> `config.yml` to stop the shade being counted twice.
+
 Every player has a **body temperature**. It rests at 98.6 °F, falls in the
 cold, rises in the heat, and settles back once they're comfortable. How cold
 or hot it feels comes straight from EZvac, so all of these count:
