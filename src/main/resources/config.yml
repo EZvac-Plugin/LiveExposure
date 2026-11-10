@@ -67,6 +67,8 @@ cold-resistance:
 # Shade: while the sun is up, a roof, an overhang or a tree overhead (any
 # solid opaque block, or leaves; glass lets the sun through) takes this much
 # off how hot it feels. Only against heat, and never below comfort.high-f.
+# Not used with EZvac BETA 1.0 Pilot 4 and newer, whose feels-like counts
+# the sun and the shade itself.
 shade:
   enabled: true
   cooling-f: 10.0

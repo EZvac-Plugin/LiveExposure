@@ -2,6 +2,24 @@
 
 All notable changes to LiveExposure are recorded here.
 
+## 0.2.1
+
+**The last release.** LiveExposure is discontinued: its body temperature is
+now part of [EZclimates](https://github.com/EZvac-Plugin/EZclimates), for
+Minecraft 26.1 and newer. 0.2.1 keeps it right on the servers it still
+serves; no new features will follow.
+
+- **No more counting the shade twice.** From EZvac BETA 1.0 Pilot 4, EZvac's
+  feels-like counts the sun and the shade itself, so LiveExposure's own
+  `shade` setting is left out there. With it, the heat in full sun was about
+  8 °F harsher than tuned. On older EZvacs nothing changes.
+- **Pointing on:** on Minecraft 26.1 and newer it says at start-up to install
+  EZclimates and remove this jar, leaving `plugins/LiveExposure`: EZclimates
+  brings your settings and your players' body temperatures over.
+- **On Minecraft 1.21.x** it keeps working as it is. When EZvac BETA 2.0
+  moves to Minecraft 26.1, this repository will be archived; its releases
+  stay downloadable.
+
 ## 0.2.0
 
 Your body temperature on EZvac's climate HUD, and faster heat and cold.

@@ -53,6 +53,7 @@ public final class LiveExposurePlugin extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+        sunCounted = countsSun(ezvac.apiVersion());
         saveDefaultConfig();
         upgradeConfig();
         loadSettings();
@@ -78,6 +79,43 @@ public final class LiveExposurePlugin extends JavaPlugin {
                 + "); sickness " + (settings.sickness().enabled() ? "on" : "off") + ", "
                 + (section == null ? "" : "on the HUD as {section:" + section + "}, ")
                 + (settings.damage().lethal() ? "deadly" : "never deadly") + ".");
+        if (sunCounted && settings.shade().enabled())
+            getLogger().info("EZvac " + ezvac.pluginVersion() + " counts the sun and the shade in its feels-like itself,"
+                    + " so LiveExposure's shade setting is not used here.");
+        if (onNewMinecraft(getServer().getMinecraftVersion()))
+            getLogger().warning("LiveExposure is discontinued, and on Minecraft 26.1 and newer its body temperature is"
+                    + " part of EZclimates (https://github.com/EZvac-Plugin/EZclimates). Install EZclimates and remove"
+                    + " this jar, leaving plugins/LiveExposure: your settings and your players' body temperatures are"
+                    + " brought over. LiveExposure 0.2.1 is its last release.");
+        else
+            getLogger().info("LiveExposure 0.2.1 is its last release: it is discontinued, and its body temperature lives"
+                    + " on in EZclimates, for Minecraft 26.1 and newer. It keeps working here as it is.");
+    }
+
+    /**
+     * Whether EZvac's feels-like already counts the sun and the shade
+     * (EZvac BETA 1.0 Pilot 4, API 1.9): then LiveExposure's own shade
+     * would count the shade a second time, and is left out.
+     */
+    private boolean sunCounted;
+
+    boolean sunCounted() { return sunCounted; }
+
+    /** API 1.9 or newer, within major version 1. */
+    static boolean countsSun(String apiVersion) {
+        String[] parts = apiVersion == null ? new String[0] : apiVersion.split("\\.");
+        try {
+            return parts.length >= 2 && Integer.parseInt(parts[0]) == 1 && Integer.parseInt(parts[1]) >= 9;
+        } catch (NumberFormatException unknown) {
+            return false;
+        }
+    }
+
+    /** Minecraft 26 or newer, where EZclimates runs and carries body temperature on. */
+    static boolean onNewMinecraft(String minecraft) {
+        if (minecraft == null) return false;
+        java.util.regex.Matcher major = java.util.regex.Pattern.compile("^(\\d+)").matcher(minecraft.trim());
+        return major.find() && Integer.parseInt(major.group(1)) >= 26;
     }
 
     @Override

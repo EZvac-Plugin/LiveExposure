@@ -75,7 +75,9 @@ final class ExposureListener implements Listener {
         }
 
         ClimateReading reading = event.getReading();
+        // From EZvac BETA 1.0 Pilot 4 its feels-like counts the sun and the shade itself: no second shade here.
         double feelsF = reading.inWater() ? reading.temperatureF()
+                : plugin.sunCounted() ? reading.feelsLikeF()
                 : BodyModel.shadedF(reading.feelsLikeF(), shaded(player), settings.shade(), settings.comfort());
         BodyModel.Conditions conditions = new BodyModel.Conditions(feelsF, reading.inWater(),
                 coldResistanceF(player, settings), player.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE),
